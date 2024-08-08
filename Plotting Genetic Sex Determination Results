@@ -1,0 +1,78 @@
+#Plotting Genetic Sex Determination Results 
+
+#Skoglung et al 2013 method 
+
+library(ggplot2)
+library(tidyr)
+library(stringr)
+
+setwd("~/Filepath//")
+
+preseq_path = "gen_sex_preseq.csv"
+
+preseq <- read.csv(preseq_path, header = TRUE)
+
+#View(preseq)
+
+#pre <- ggplot(preseq, aes(y = ID, x = R_y)) #to plot all indivduals in together 
+pre <- ggplot(preseq, aes(y = ID, x = R_y, fill = Site)) #to color by site
+pre + geom_errorbarh(aes(xmin = R_y - SE, xmax = R_y + SE), height = .05) +
+  geom_point(shape = 21, size = 2) +
+  theme_classic() +
+  #geom_vline(xintercept=0.016, colour = "gold",linetype='dashed') +
+  #geom_vline(xintercept=0.003, colour = "gold",linetype='dotted') +
+  #geom_vline(xintercept = 0.075, colour = "darkorchid4",linetype='dashed') +
+  #geom_vline(xintercept = 0.35, colour = "darkorchid4",linetype='dotted') +
+  #geom_vline(xintercept = 0.044, colour = "black",linetype='dashed') +
+  ylab("Individual ID") +
+  scale_fill_brewer(type = "seq", palette = "Spectral") +
+  ggtitle(paste0("R_y, ratio of y/y+x reads (Skoglund 2013 Method)"))
+
+#ggsave("output.png", width = 8, height = 6)
+
+#plotting Schiffels (Method 2, also featured in Anastasiadou at al 2024)
+
+#form ratios xCov/autCov and yCov/autCov
+
+pre <- ggplot(preseq, aes(x = X_auto_reads, y = Y_auto_reads, fill = Site))
+pre + geom_text(aes(label = ID)) +
+pre + geom_point(shape = 23, size = 3) +
+  #geom_point() + 
+  theme_classic(
+    #strip.background = element_blank(),
+    #panel.background = element_blank(),
+    #strip.text.x = element_text(size = 18, color = "black"),
+    #axis.text = element_blank(),
+    #axis.ticks = element_blank(),
+    #axis.title = element_blank(),
+    #axis.line = element_blank(),
+    #legend.position = "none",
+    #legend.position = "right",
+    #legend.title = element_blank()
+  ) +
+  scale_fill_brewer(type = "seq", palette = "Spectral") +
+  ggtitle(paste0("Genetic Sex - Schiffels Method (Sex Chrom:Autosomal Read Counts)"))
+
+#ggsave("output.png", width = 8, height = 6)
+
+######################## Skoglund new
+
+pre <- ggplot(pre.tidy, aes(x = X_auto_reads, y = Y_auto_reads))
+pre + geom_point() +
+  #geom_text(aes(label = ID)) + 
+  # 
+  theme_classic(
+    #strip.background = element_blank(),
+    #panel.background = element_blank(),
+    #strip.text.x = element_text(size = 18, color = "black"),
+    #axis.text = element_blank(),
+    #axis.ticks = element_blank(),
+    #axis.title = element_blank(),
+    #axis.line = element_blank(),
+    #legend.position = "none",
+    #legend.position = "right",
+    #legend.title = element_blank()
+  ) +
+  scale_colour_brewer(type = "seq", palette = "Spectral") +
+  ggtitle(paste0("Sex Determination Schiffels Method"))
+

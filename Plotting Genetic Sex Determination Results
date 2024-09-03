@@ -1,6 +1,10 @@
-#Plotting Genetic Sex Determination Results 
+# Plotting Genetic Sex Determination Results 
+# Three different visualization methods 
+# See README for more details
 
-#Skoglung et al 2013 method 
+######################## 
+# load packages and read in data
+######################## 
 
 library(ggplot2)
 library(tidyr)
@@ -13,6 +17,10 @@ preseq_path = "gen_sex_preseq.csv"
 preseq <- read.csv(preseq_path, header = TRUE)
 
 #View(preseq)
+
+######################## 
+# Skoglung et al 2013 method 
+######################## 
 
 #pre <- ggplot(preseq, aes(y = ID, x = R_y)) #to plot all indivduals in together 
 pre <- ggplot(preseq, aes(y = ID, x = R_y, fill = Site)) #to color by site
@@ -55,7 +63,11 @@ pre + geom_point(shape = 23, size = 3) +
 
 #ggsave("output.png", width = 8, height = 6)
 
-######################## Skoglund new
+######################## 
+# Plotting x:autosome read counts versus y:autosome read counts
+# As in Anastasiadou et al 2024
+# See README for link and more information
+######################## 
 
 pre <- ggplot(pre.tidy, aes(x = X_auto_reads, y = Y_auto_reads))
 pre + geom_point() +
@@ -75,4 +87,6 @@ pre + geom_point() +
   ) +
   scale_colour_brewer(type = "seq", palette = "Spectral") +
   ggtitle(paste0("Sex Determination Schiffels Method"))
+
+#ggsave("output.png", width = 8, height = 6)
 

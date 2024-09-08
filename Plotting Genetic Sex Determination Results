@@ -1,6 +1,6 @@
-# Plotting Genetic Sex Determination Results 
+# Plotting Genetic Sex Determination Results from ancient DNA Data
 # Three different visualization methods 
-# See README for more details
+See README for more details
 
 ######################## 
 # load packages and read in data
@@ -16,10 +16,8 @@ preseq_path = "gen_sex_preseq.csv"
 
 preseq <- read.csv(preseq_path, header = TRUE)
 
-#View(preseq)
-
 ######################## 
-# Skoglung et al 2013 method 
+# Visualization based on Skoglung et al 2013 (full citation in README)
 ######################## 
 
 #pre <- ggplot(preseq, aes(y = ID, x = R_y)) #to plot all indivduals in together 

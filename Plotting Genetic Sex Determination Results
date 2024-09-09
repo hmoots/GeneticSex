@@ -17,7 +17,7 @@ preseq_path = "gen_sex_preseq.csv"
 preseq <- read.csv(preseq_path, header = TRUE)
 
 ######################## 
-# Visualization based on Skoglung et al 2013 (full citation in README)
+# Visualization #1 - based on Skoglung et al 2013 (full citation in README)
 ######################## 
 
 #pre <- ggplot(preseq, aes(y = ID, x = R_y)) #to plot all indivduals in together 
@@ -36,7 +36,16 @@ pre + geom_errorbarh(aes(xmin = R_y - SE, xmax = R_y + SE), height = .05) +
 
 #ggsave("output.png", width = 8, height = 6)
 
-#plotting Schiffels (Method 2, also featured in Anastasiadou at al 2024)
+######################## 
+# Visualization #2 -  based  blog by Stephan Schiffels and also featured in Anastasiadou at al 2024
+########################
+
+######################## 
+# Visualization #2
+# Plotting x:autosome read counts versus y:autosome read counts
+# As in Anastasiadou et al 2024
+# See README for link and more information
+######################## 
 
 #form ratios xCov/autCov and yCov/autCov
 

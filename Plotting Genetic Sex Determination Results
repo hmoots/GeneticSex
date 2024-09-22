@@ -12,16 +12,18 @@ library(stringr)
 
 setwd("~/Filepath//")
 
-preseq_path = "gen_sex_preseq.csv"
+sdstats_path = "gen_sex_sdstats.csv"
 
-preseq <- read.csv(preseq_path, header = TRUE)
+sdstats <- read.csv(sdstats_path, header = TRUE)
 
 ######################## 
-# Visualization #1 - based on Skoglung et al 2013 (full citation in README)
+# Visualization #1 - based on Skoglund et al 2013 (full citation in README)
+# the vertical lines are based on empirical observations for modern human data
+# for other species, you can leave these out
 ######################## 
 
-#pre <- ggplot(preseq, aes(y = ID, x = R_y)) #to plot all indivduals in together 
-pre <- ggplot(preseq, aes(y = ID, x = R_y, fill = Site)) #to color by site
+#pre <- ggplot(sdstats, aes(y = ID, x = R_y)) #to plot all indivduals in together 
+pre <- ggplot(sdstats, aes(y = ID, x = R_y, fill = Site)) #to color by site
 pre + geom_errorbarh(aes(xmin = R_y - SE, xmax = R_y + SE), height = .05) +
   geom_point(shape = 21, size = 2) +
   theme_classic() +
@@ -38,10 +40,6 @@ pre + geom_errorbarh(aes(xmin = R_y - SE, xmax = R_y + SE), height = .05) +
 
 ######################## 
 # Visualization #2 -  based  blog by Stephan Schiffels and also featured in Anastasiadou at al 2024
-########################
-
-######################## 
-# Visualization #2
 # Plotting x:autosome read counts versus y:autosome read counts
 # As in Anastasiadou et al 2024 And Schiffels lab blog post
 # See README for link and more information
@@ -49,7 +47,7 @@ pre + geom_errorbarh(aes(xmin = R_y - SE, xmax = R_y + SE), height = .05) +
 
 #form ratios xCov/autCov and yCov/autCov
 
-pre <- ggplot(preseq, aes(x = X_auto_reads, y = Y_auto_reads, fill = Site))
+pre <- ggplot(sdstats, aes(x = X_auto_reads, y = Y_auto_reads, fill = Site))
 pre + geom_text(aes(label = ID)) +
 pre + geom_point(shape = 23, size = 3) +
   #geom_point() + 

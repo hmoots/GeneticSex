@@ -1,6 +1,6 @@
 # Plotting Genetic Sex Determination Results from ancient DNA Data
 # Two different visualization methods 
-See README for more details
+# See README for more details
 
 ######################## 
 # load packages and read in data
@@ -10,7 +10,7 @@ library(ggplot2)
 library(tidyr)
 library(stringr)
 
-setwd("~/Filepath//")
+setwd("~/Filepath/")
 
 sdstats_path = "gen_sex_sdstats.csv"
 

@@ -1,0 +1,290 @@
+#!/bin/bash -l
+
+########################################
+########## Get Sample List #############
+########################################
+
+# in order to get a sample list ("samp_list")from the metadata table, you can use sed as below:
+# awk '{print$1}' ../GenErode/config/historical_samples.txt | sed -r -e 's/(_[0-9]+_L[0-9]+)//g' > samp_list
+
+
+########################################
+cd ${1}.MQ30.qualimap/
+
+X=$(grep NC_064846.1 genome_results.txt | awk '{print $4*1000}')
+Y=$(grep NC_064847.1 genome_results.txt | awk '{print $4*1000}')
+total=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_coverage+=$4}; END {print sum_coverage/(FNR)*1000}')
+X_cov=$(echo "scale=4; $X / $total" | bc)
+Y_cov=$(echo "scale=4; $Y / $total" | bc)
+RATIO=$(echo "scale=4; $Y/$X" | bc)
+
+echo "$1 $X_cov $Y_cov $RATIO"
+
+
+########################################
+
+
+ml bioinfo-tools
+ml samtools
+
+samtools idxstats hmm010B3_1046_L1.sorted.bam > hmm010B3_1046_L1.sorted.bam.idxstats
+
+
+samtools idxstats hmm006A3.merged.rmdup.merged.realn.bam > hmm006A3.merged.idxstats
+
+samtools idxstat hmm006D2_1012_L2.sorted.bam > hmm006D2_1012_L2.sorted.bam.idxstats
+
+
+
+NC_064846.1 (X) and NC_064847.1 (Y)
+
+########################################
+
+# sex determinations
+#!/bin/bash -l
+
+${1}.merged.rmdup.merged.realn.bam
+
+X=$(grep NC_064846.1 ${1}.merged.rmdup.merged.realn.bam | awk '{print $4*1000}')
+Y=$(grep NC_064847.1 ${1}.merged.rmdup.merged.realn.bam | awk '{print $4*1000}')
+total=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_coverage+=$4}; END {print sum_coverage/(FNR)*1000}')
+X_cov=$(echo "scale=4; $X / $total" | bc)
+Y_cov=$(echo "scale=4; $Y / $total" | bc)
+RATIO=$(echo "scale=4; $Y/$X" | bc)
+
+echo "$1 $X_cov $Y_cov $RATIO"
+
+
+########################################
+
+
+sbatch bam_depth.sh hmm010A4.merged.rmdup.merged.realn.bam
+
+
+#SBATCH -A naiss2024-5-54
+
+
+## usage of the script
+# cd /path/to/GenErode/
+# for i in $(cat samp_list); do sbatch bam_depth.sh $i; done
+
+# alternative usage for a single sample
+# sbatch collect_stats.sh {samp}
+
+
+############################################
+
+cd /proj/sllstore2017093/mammoth/mamba/generode/GenErode/results/historical/mapping/GCF_024166365.1_mEleMax1.human_g1k_v37.DQ188829.2/stats/bams_indels_realigned
+# sex determinations
+
+#sex_assign.sh
+
+#!/bin/bash -l
+#SBATCH -A naiss2024-5-54
+#SBATCH -p core
+#SBATCH -n 4
+#SBATCH -t 03:00:00
+#SBATCH -J sex_assignment
+
+## usage of the script
+# cd /path/to/GenErode/
+# for i in $(cat samp_list); do sbatch sex_assign.sh $i; done
+
+# alternative usage for a single sample
+# sbatch sex_assign.sh {samp}
+
+cd ${1}.merged.rmdup.merged.realn.bam.qualimap/
+
+X=$(grep NC_064846.1 genome_results.txt | awk '{print $4*1000}')
+Y=$(grep NC_064847.1 genome_results.txt | awk '{print $4*1000}')
+total=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_coverage+=$4}; END {print sum_coverage/(FNR)*1000}')
+X_Auto=$(echo "scale=4; $X / $total" | bc)
+Y_Auto=$(echo "scale=4; $Y / $total" | bc)
+R_y=$(echo "scale=4; $Y / ($X + $Y)" | bc)
+SE=$(bc -l <<< "scale=3; sqrt(($R_y*(1.0 - $R_y))/($X + $Y))")
+RATIO=$(echo "scale=4; $Y/$X" | bc)
+
+cd ..
+
+echo "$1,$X,$Y,$total,$X_Auto,$Y_Auto,$RATIO,$R_y,$SE" >> genetic_sex.csv
+
+echo "$1 $X $Y $total $X_Auto $Y_Auto $RATIO $R_y $SE"
+
+#to do
+move sample list over to directory you are working in
+add autosomal coverage
+X: autosome
+Y: autosome
+X:8
+R_y - Y:Y+X
+
+hmm006A3_1037_L2.sorted.bam.qualimap
+
+sbatch sex_assign.sh hmm006A3_1037_L2
+
+############################################
+
+a=$(bc <<< "scale=0; sqrt($VAR)")
+echo "$a"
+
+a=$(bc <<< "scale=0; sqrt($R_y/($X + $Y))")
+
+a=$(bc -l <<< "scale=3; sqrt(($R_y*(1.0 - $R_y))/($X + $Y))")
+
+############################################
+
+add headers before running
+
+echo "ID,X_cov,Y_cov,total_coverage,X_auto,Y_auto,Ratio,X_reads,Y_reads,total_reads,X_auto_reads,Y_auto_reads,R_y,Standard_error" > genetic_sex2.csv
+
+
+############################################
+
+
+#!/bin/bash -l
+#S
+#!/bin/bash -l
+#SBATCH -A naiss2024-5-54
+#SBATCH -J sex_assignment
+
+## usage of the script
+# cd /path/to/GenErode/
+# for i in $(cat uniq_samp_list); do sbatch sex_assign2.sh $i; done
+
+# alternative usage for a single sample
+# sbatch sex_assign.sh {samp}
+
+cd ${1}.merged.rmdup.merged.realn.bam.qualimap/
+
+X=$(grep NC_064846.1 genome_results.txt | awk '{print $4*1000}')
+Y=$(grep NC_064847.1 genome_results.txt | awk '{print $4*1000}')
+total_cov=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_coverage+=$4}; END {print sum_coverage/(FNR)*1000}')
+X_auto_cov=$(echo "scale=4; $X / $total_cov" | bc)
+Y_auto_cov=$(echo "scale=4; $Y / $total_cov" | bc)
+RATIO=$(echo "scale=4; $Y/$X" | bc)
+X_reads=$(grep NC_064846.1 genome_results.txt | awk '{print $3}')
+Y_reads=$(grep NC_064847.1 genome_results.txt | awk '{print $3}')
+total_reads=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_reads+=$3}; END {print sum_reads}')
+X_auto_reads=$(echo "scale=5; $X_reads / $total_reads" | bc)
+Y_auto_reads=$(echo "scale=6; $Y_reads / $total_reads" | bc)
+R_y=$(echo "scale=8; $Y_reads / ($X_reads + $Y_reads)" | bc)
+SE=$(echo "scale=8; sqrt(($R_y*(1-$R_y))/($X_reads + $Y_reads))" | bc)
+
+cd ..
+
+echo "$1,$X,$Y,$total_cov,0$X_auto_cov,0$Y_auto_cov,0$RATIO,$X_reads,$Y_reads,$total_reads,0$X_auto_reads,0$Y_auto_reads,0$R_y,$SE" >> genetic_sex2.csv
+
+#############################################
+
+
+SE=$(bc -l <<< "scale=8; sqrt(($R_y*(1-$R_y))/($X_reads + $Y_reads))")
+SE=$(echo "scale=8; sqrt(($R_y*(1-$R_y))/($X_reads + $Y_reads))" | bc)
+S=$(echo "scale=8; sqrt($R_y*(1-$R_y))"| bc)
+E=$(echo "scale=8; $X_reads + $Y_reads" | bc)
+SE=$(echo "scale=8; $S/$E" | bc)
+
+(bc -l <<< "scale=8; sqrt(($R_y*(1-$R_y))/($X_reads + $Y_reads))")
+
+
+
+
+SE=$(bc -l <<< "scale=4; sqrt(((($Y_reads / ($X_reads + $Y_reads))))*(1-($Y_reads / ($X_reads + $Y_reads))))/($X_reads + $Y_reads))")
+
+
+# total reads of elephant genome
+
+total_reads=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_reads+=$2}; END {print sum_reads}')
+
+
+
+SE=$(echo "scale=4; sqrt(($R_y*(1-$R_y))/($X_reads + $Y_reads))" | bc)
+inv=$(1.0 - $R_y)
+
+
+
+sqrt((0.0050*(1-0.0050))/(1234888 + 6232)
+############################################
+
+
+echo "$1 $X $Y $total $X_Auto $Y_Auto $RATIO $R_y $SE" > tmp1.txt
+
+uniq tmp1.txt > sex_assignments.txt
+
+sort -k1,1 genetic_sex2.csv | uniq > uniq_genetic_sex.csv
+
+
+
+############################################
+
+scp hmoots@rackham.uppmax.uu.se:/proj/sllstore2017093/mammoth/mamba/generode/GenErode/results/historical/mapping/GCF_024166365.1_mEleMax1.human_g1k_v37.DQ188829.2/stats/bams_indels_realigned/sex_assignments.txt .
+
+scp hmoots@rackham.uppmax.uu.se:/proj/sllstore2017093/mammoth/mamba/generode/GenErode/results/historical/mapping/GCF_024166365.1_mEleMax1.human_g1k_v37.DQ188829.2/stats/bams_indels_realigned/genetic_sex.csv .
+
+##################### only if looking for aneuploidy 
+Eight=$(grep NC_064847.1 genome_results.txt | awk '{print $3}')
+X_Eight=$(echo "scale=4; $Y / ($X + $Y)" | bc)
+
+
+############################################
+
+
+#!/bin/bash -l
+#S
+#!/bin/bash -l
+#SBATCH -A naiss2024-5-54
+#SBATCH -J sex_assignment
+
+## usage of the script
+# cd /path/to/workingdirectory/
+# for i in $(cat samp_list); do sbatch sex_assign.sh $i; done
+
+# alternative usage for a single sample
+# sbatch sex_assign.sh {samp}
+
+cd ${1}.bam.MQ30.qualimap/
+
+X=$(grep NC_064846.1 genome_results.txt | awk '{print $4*1000}')
+Y=$(grep NC_064847.1 genome_results.txt | awk '{print $4*1000}')
+total_cov=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_coverage+=$4}; END {print sum_coverage/(FNR)*1000}')
+X_auto_cov=$(echo "scale=4; $X / $total_cov" | bc)
+Y_auto_cov=$(echo "scale=4; $Y / $total_cov" | bc)
+RATIO=$(echo "scale=4; $Y/$X" | bc)
+X_reads=$(grep NC_064846.1 genome_results.txt | awk '{print $3}')
+Y_reads=$(grep NC_064847.1 genome_results.txt | awk '{print $3}')
+total_reads=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_reads+=$3}; END {print sum_reads}')
+X_auto_reads=$(echo "scale=5; $X_reads / $total_reads" | bc)
+Y_auto_reads=$(echo "scale=6; $Y_reads / $total_reads" | bc)
+R_y=$(echo "scale=8; $Y_reads / ($X_reads + $Y_reads)" | bc)
+SE=$(echo "scale=8; sqrt(($R_y*(1-$R_y))/($X_reads + $Y_reads))" | bc)
+
+cd ..
+
+echo "$1,$X,$Y,$total_cov,0$X_auto_cov,0$Y_auto_cov,0$RATIO,$X_reads,$Y_reads,$total_reads,0$X_auto_reads,0$Y_auto_reads,0$R_y,$SE" >> genetic_sex2.csv
+
+#############################################
+
+X=$(grep NC_064846.1 genome_results.txt | awk '{print $4*1000}')
+Y=$(grep NC_064847.1 genome_results.txt | awk '{print $4*1000}')
+total_cov=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_coverage+=$4}; END {print sum_coverage/(FNR)*1000}')
+X_auto_cov=$(echo "scale=4; $X / $total_cov" | bc)
+Y_auto_cov=$(echo "scale=4; $Y / $total_cov" | bc)
+RATIO=$(echo "scale=4; $Y/$X" | bc)
+X_reads=$(grep NC_064846.1 genome_results.txt | awk '{print $3}')
+Y_reads=$(grep NC_064847.1 genome_results.txt | awk '{print $3}')
+total_reads=$(grep "NC" genome_results.txt | grep -v "NC_064846.1" | grep -v "NC_064847.1" | awk ' {sum_reads+=$3}; END {print sum_reads}')
+X_auto_reads=$(echo "scale=5; $X_reads / $total_reads" | bc)
+Y_auto_reads=$(echo "scale=6; $Y_reads / $total_reads" | bc)
+R_y=$(echo "scale=8; $Y_reads / ($X_reads + $Y_reads)" | bc)
+SE=$(echo "scale=8; sqrt(($R_y*(1-$R_y))/($X_reads + $Y_reads))" | bc)
+
+
+echo "$X_reads,$Y_reads,$total_reads,0$X_auto_reads,0$Y_auto_reads,0$R_y,$SE"
+
+
+scp hmoots@rackham.uppmax.uu.se:/proj/sllstore2017093/mammoth/final_bams_stats/ancient_dna/genetic_sex2.csv .
+
+mv /proj/sllstore2017093/mammoth/final_bams_stats/ancient_dna/
+mv /proj/sllstore2017093/mammoth/final_bams_stats/ancient_dna/genetic_sex2.csv .
+mv /proj/sllstore2017093/mammoth/final_bams_stats/ancient_dna/genetic_sex3.csv .
+mv /proj/sllstore2017093/mammoth/final_bams_stats/ancient_dna/sex_assign.sh .
+

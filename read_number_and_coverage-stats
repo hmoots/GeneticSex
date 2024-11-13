@@ -20,6 +20,12 @@ RATIO=$(echo "scale=4; $Y/$X" | bc)
 
 echo "$1 $X_cov $Y_cov $RATIO"
 
+###
+#"scale" indicates the number of decimal places you would like printed 
+https://nick3499.medium.com/bash-echo-scale-bc-numerical-fractions-753fb979792c
+
+# see examples below for variable values
+#calculate coverage across each chromosome
 
 ########################################
 
